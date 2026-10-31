@@ -1,0 +1,30 @@
+# MTL for Nguy Lang Nhan Blockout
+newmtl Mat_WolfFur
+Kd 0.17 0.18 0.20
+Ks 0.1 0.1 0.1
+Ns 10
+
+newmtl Mat_CloakBrown
+Kd 0.33 0.27 0.22
+Ks 0.05 0.05 0.05
+Ns 5
+
+newmtl Mat_Tunic
+Kd 0.22 0.20 0.18
+Ks 0.05 0.05 0.05
+Ns 5
+
+newmtl Mat_BandageWraps
+Kd 0.58 0.52 0.45
+Ks 0.05 0.05 0.05
+Ns 5
+
+newmtl Mat_Claws
+Kd 0.05 0.05 0.05
+Ks 0.4 0.4 0.4
+Ns 50
+
+newmtl Mat_PouchLeather
+Kd 0.28 0.20 0.14
+Ks 0.1 0.1 0.1
+Ns 15
