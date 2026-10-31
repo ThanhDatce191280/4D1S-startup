@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad2dcb93fad633a4d9d40acbe511db00, type: 3}
+  m_Name: Recipe_recipe_iron_sword
+  m_EditorClassIdentifier: HuyetNguyetDaiNgan.Runtime::HuyetNguyetDaiNgan.Inventory.CraftingRecipeSO
+  recipeId: recipe_iron_sword
+  recipeName: "Tr\u01B0\u1EDDng Ki\u1EBFm S\u1EAFt"
+  description: "R\xE8n luy\u1EC7n v\u0169 kh\xED t\u1EF1 v\u1EC7 tr\u01B0\u1EDBc
+    b\u1EA7y s\xF3i khi \u0111\xEAm Huy\u1EBFt Nguy\u1EC7t bu\xF4ng xu\u1ED1ng."
+  ingredients:
+  - item: {fileID: 11400000, guid: 03cd28a73e5e79f4aac6db77a3e3a031, type: 2}
+    amount: 5
+  - item: {fileID: 11400000, guid: 1acd58efa7af50a40803cbc045afb4ee, type: 2}
+    amount: 5
+  resultItem: {fileID: 11400000, guid: 4411409bf24921340be0204a4517d800, type: 2}
+  resultAmount: 1

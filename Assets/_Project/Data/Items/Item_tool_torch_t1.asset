@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11a4bcaa3a52c0c4184f1914528153ef, type: 3}
+  m_Name: Item_tool_torch_t1
+  m_EditorClassIdentifier: HuyetNguyetDaiNgan.Runtime::HuyetNguyetDaiNgan.Inventory.ItemDataSO
+  itemId: tool_torch_t1
+  itemName: "\u0110u\u1ED1c S\xE1ng \u0110i R\u1EEBng"
+  description: "\u0110u\u1ED1c t\u1EA9m nh\u1EF1a c\xE2y th\u1EAFp s\xE1ng m\xE0n
+    \u0111\xEAm v\xE0 xua \u0111u\u1ED5i th\xFA d\u1EEF ban \u0111\xEAm."
+  itemType: 3
+  maxStackSize: 1
+  icon: {fileID: 0}
+  placeholderColor: {r: 1, g: 1, b: 1, a: 1}
+  iconGlyph: "\U0001F525"
+  healthRestore: 0
+  hungerRestore: 0
+  staminaRestore: 0
+  manaRestore: 0
+  weaponData: {fileID: 0}

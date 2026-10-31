@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11a4bcaa3a52c0c4184f1914528153ef, type: 3}
+  m_Name: Item_tool_stone_axe_t1
+  m_EditorClassIdentifier: HuyetNguyetDaiNgan.Runtime::HuyetNguyetDaiNgan.Inventory.ItemDataSO
+  itemId: tool_stone_axe_t1
+  itemName: "R\xECu \u0110\xE1 Th\xF4 S\u01A1"
+  description: "L\u01B0\u1EE1i \u0111\xE1 gh\xE8 bu\u1ED9c ch\u1EB7t v\xE0o c\xE1n
+    g\u1ED7, ch\u1EB7t c\xE2y nhanh g\u1EA5p \u0111\xF4i tay kh\xF4ng."
+  itemType: 3
+  maxStackSize: 1
+  icon: {fileID: 0}
+  placeholderColor: {r: 1, g: 1, b: 1, a: 1}
+  iconGlyph: "\U0001FA93"
+  healthRestore: 0
+  hungerRestore: 0
+  staminaRestore: 0
+  manaRestore: 0
+  weaponData: {fileID: 0}

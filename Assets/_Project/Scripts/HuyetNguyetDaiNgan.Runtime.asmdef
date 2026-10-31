@@ -1,0 +1,22 @@
+{
+    "name": "HuyetNguyetDaiNgan.Runtime",
+    "rootNamespace": "HuyetNguyetDaiNgan",
+    "references": [
+        "Unity.InputSystem",
+        "Cinemachine",
+        "Unity.AI.Navigation",
+        "Unity.TextMeshPro",
+        "UnityEngine.UI",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Core.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

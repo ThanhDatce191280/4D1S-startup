@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad2dcb93fad633a4d9d40acbe511db00, type: 3}
+  m_Name: Recipe_recipe_bamboo_rice
+  m_EditorClassIdentifier: HuyetNguyetDaiNgan.Runtime::HuyetNguyetDaiNgan.Inventory.CraftingRecipeSO
+  recipeId: recipe_bamboo_rice
+  recipeName: "C\u01A1m Lam \u1ED0ng N\u1EE9a"
+  description: "\u0110un n\u01B0\u1EDBng th\u1EE9c \u0103n gi\xFAp h\u1ED3i ph\u1EE5c
+    sinh l\u1EF1c v\xE0 \u0111\u1ED9 no d\u1ED3i d\xE0o."
+  ingredients:
+  - item: {fileID: 11400000, guid: 03cd28a73e5e79f4aac6db77a3e3a031, type: 2}
+    amount: 2
+  - item: {fileID: 11400000, guid: 8932bbe18ccdf9b4f83853596f58cae6, type: 2}
+    amount: 3
+  resultItem: {fileID: 11400000, guid: 2bc36e1e987d2f34981798773f3a8363, type: 2}
+  resultAmount: 1

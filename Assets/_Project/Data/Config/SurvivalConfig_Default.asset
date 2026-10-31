@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82928a1f6edf51847aceed8233d5d81f, type: 3}
+  m_Name: SurvivalConfig_Default
+  m_EditorClassIdentifier: HuyetNguyetDaiNgan.Runtime::HuyetNguyetDaiNgan.Core.SurvivalConfigSO
+  maxHunger: 100
+  hungerDrainRate: 0.5
+  wellFedThreshold: 80
+  wellFedHealthRegenRate: 1.5
+  starvationDamageRate: 3
+  maxStamina: 100
+  sprintStaminaDrainRate: 14
+  attackStaminaCost: 15
+  staminaRegenRate: 22
+  staminaRegenDelay: 0.8
+  maxMana: 100
+  manaRegenRate: 5
