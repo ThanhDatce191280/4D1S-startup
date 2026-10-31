@@ -1,87 +1,55 @@
-# Project Roadmap: Huyết Nguyệt Đại Ngàn
+# Roadmap — baseline LAN 4–6 và phe ẩn
 
-## 1. Tổng Quan Lộ Trình & Sơ Đồ Phụ Thuộc (Dependency Map)
+Cập nhật 31/10/2026 theo `docs/vision/PRODUCT_CANON.md`. Roadmap này thay M6–M15 cũ; giữ lịch sử M0–M5. Các mốc sau M5 là kế hoạch, chưa triển khai/nghiệm thu.
 
-Dự án được chia thành 16 Milestone (M0 → M15) theo 4 giai đoạn chiến lược. Quy tắc bất biến: **Hoàn thành Vertical Slice (M8) trước khi mở rộng quy mô thế giới và hệ thống nâng cao (M9 → M15).**
+## 1. Dependency và gate
 
-```mermaid
-flowchart TD
-    subgraph G1["Giai đoạn 1: Nền Tảng & Vòng Lặp Cơ Bản"]
-        M0["M0: Planning & Decisions"] --> M1["M1: Unity Setup & Standards"]
-        M1 --> M2["M2: 3D Controller & Camera"]
-        M2 --> M3["M3: Combat Prototype"]
-        M2 --> M4["M4: Survival Core (4 Stats)"]
-        M3 --> M5["M5: Inventory & Crafting"]
-        M4 --> M5
-    end
+M0 → M1 → M2 → M3 → M4 → M5 → **M5R** → **M6N** → **M6W** → **M7** → **M8 core** → **M9** → **M10** → **M11** → **M12 demo**.
 
-    subgraph G2["Giai đoạn 2: Thế Giới & Vertical Slice"]
-        M5 --> M6["M6: Biome 1 & Spawn System"]
-        M6 --> M7["M7: Day/Night & Blood Moon"]
-        M7 --> M8["M8: VERTICAL SLICE (Cột mốc sống còn)"]
-    end
+M3→M4 thể hiện dependency Health/combat thực tế. Tài liệu/content brief có thể chuẩn bị song song, nhưng không mở rộng gameplay trước gate nền tảng. Save, networking, QA và profiling xuyên suốt, không đợi cuối roadmap.
 
-    subgraph G3["Giai đoạn 3: Chiều Sâu Mô Phỏng & Nghi Kỵ"]
-        M8 --> M9["M9: NPC & Village Simulation"]
-        M9 --> M10["M10: Werewolf Deception"]
-        M8 --> M11["M11: RPG Mastery & Ngũ Linh Thạch"]
-        M9 --> M12["M12: Base Building, Traps & Raids"]
-    end
+| Mốc / owner trách nhiệm | Scope | Definition of Done và evidence |
+| --- | --- | --- |
+| M0–M4 | Nền tảng/controller/combat/survival | COMPLETED theo handoff cũ; không tái chứng nhận trong lần sửa tài liệu. |
+| M5 — Systems + QA | Inventory/crafting hiện có | READY_FOR_VERIFICATION; chạy standalone nhặt→craft→equip→ăn và test đầy túi, có build ID. |
+| M5R — Lead + QA | Chốt canon, gap M5/SCOPE, learning/spike backlog | Ghi rõ phần có/chưa có Roll/combo/Mana; checklist M5 có bằng chứng, không tick theo code tồn tại. |
+| M6N — Lead + Systems | LAN authority, save/reconnect, host migration | 6 process trên ≥2 máy; 100 giao dịch tranh đồ không duplicate; graceful/abrupt migration mỗi loại 10 lần khi đủ quorum; test partition/phòng 2 người, owner save sync. Báo giới hạn/fallback, không giấu trường hợp không đủ quorum. |
+| M6W — Systems + World + UI | Hoàn thiện combat/survival, mộ/phép hồi sinh/team wipe, mastery schema | 20 ca death/loot/revive đồng thời và reconnect/migrate không mất đồ/reset cooldown; không tự respawn; whole-team death ghi bad ending đúng một lần; nhánh phép tiếp cận được trước rủi ro đầu tiên. |
+| M7 — World + Level | Một biome/clock/raid, village targets, tutorial | 4 rồi 6 người chơi vòng ngày đêm 15–20 phút, đủ nguồn nấu ăn/sửa cổng; wave và target có luật; save/loading không tái sinh đồ hoặc quên quest. |
+| M8 — cả đội | Core vertical slice: sinh tồn/chế tạo + combat | 3 nhóm mới 4–6 người thử, ≥75% hoàn thành tutorial không trợ giúp; 2 session ×2 giờ nội bộ ổn định; migration cùng combat/save đạt test matrix. Chưa gọi đây là demo phe phái đầy đủ. |
+| M9 — World + Level + UI | Sinh tồn xây làng và nghi kỵ | Socket tường/bẫy, kho/3 vai trò NPC; một đoàn buôn, hai clue, một xác thực và ba lựa chọn nhận/cách ly/từ chối đều có hậu quả; 20 seed/test case không softlock. |
+| M10 — Systems + World + Narrative owner | Phe ẩn cá nhân, quest ẩn, equipment/mastery, quyền PvP | Nhóm 2 Người/2 Sói và nhóm 6 mixed chạy được; UI/AI/packet thường không lộ TrueFaction; 10 reconnect/migration giữ bí mật, thưởng một lần; không farm mastery bằng đánh đồng đội/hồi sinh. |
+| M11 — World + Narrative + Systems | Một chương, vua tier9/cận vệ, adaptive tactics, đá hữu hạn, endings | 3 outcome đều có đường chơi/test; king death không respawn, WolfDominion→tier10; test cùng-tick wipe/king death; 3 lần raid có log tactic đổi theo evidence; quota đá bảo toàn qua mộ/trade/socket/offline/migration. |
+| M12 — Lead/Producer + QA + Art | MVP demo công khai polish/QA/build | Đạt acceptance MVP_SCOPE; clean install→LAN→chơi chương→save→migrate→load; settings/audio/readability, asset source/license manifest; không blocker/critical đã biết, có hướng dẫn giới hạn migration và cấu hình đo. |
+| M13+ — chưa cam kết | Biome tiếp, mastery sâu, free building, phe/NPC mở rộng | Mỗi biome/nhánh có estimate và gate riêng sau dữ liệu demo. Không còn gói “5 biomes + 9 tier” trong một milestone. |
 
-    subgraph G4["Giai đoạn 4: 5 Biomes, Phe Phái & Phát Hành"]
-        M10 --> M13["M13: 5 Biomes & Underground Mines"]
-        M11 --> M13
-        M12 --> M13
-        M13 --> M14["M14: Factions & 4 Endings"]
-        M14 --> M15["M15: Save/Load, Polish & Release"]
-    end
-```
+M6N thất bại không được lặng lẽ bỏ migration: ghi vấn đề, bổ sung spike hoặc đề xuất đổi yêu cầu cho chủ dự án. Không chốt ngày phát hành trước khi biết networking khả thi.
 
----
+## 2. Chuyển từ roadmap cũ
 
-## 2. Danh Sách 16 Milestones & Deliverables
+M6 cũ→M6N/M6W/M7; M7 cũ→M7; M8 giữ trọng tâm core nhưng có LAN. M9/M10 cũ→M9/M10; một phần M11/M12 cũ làm mẫu hẹp trong demo; M13/M14 cũ được chia thành chapter M11 và backlog sau demo. M15 cũ được phân bổ QA/save/performance vào từng mốc và đóng gói M12. Bốn ending cũ bị canon thay, không chỉ đổi lịch.
 
-| Milestone | Tên Milestone | Trọng tâm kỹ thuật | Deliverables chính | Độ phức tạp |
-| :--- | :--- | :--- | :--- | :--- |
-| **M0** | Feasibility, Scope & Technical Planning | Chốt quyết định kiến trúc, lập bộ tài liệu chuẩn `docs/`. | 6 tài liệu nền tảng trong `docs/`. | Thấp (S) |
-| **M1** | Environment & Unity Foundation | Khởi tạo Project Unity 6 URP, Git, `.gitignore`, Coding Standards. | Project Unity chạy không lỗi, Scene rỗng, bản build `.exe` test. | Thấp (S) |
-| **M2** | 3D Character Controller & Camera | Di chuyển Isometric 3/4, Cinemachine, xoay nhân vật, animation cơ bản. | Prefab `Player`, Prefab `CameraRig`, Scene `Test_Movement`. | Vừa (M) |
-| **M3** | Combat Prototype | Hitbox, `HealthComponent`, AI quái FSM cơ bản, hiệu ứng trúng đòn. | Scene `Test_CombatArena`, Unit Tests sát thương, AI Sói Bậc 1. | Vừa (M) |
-| **M4** | Survival Core | 4 thanh: HP, Hunger, Stamina, Mana; chặt cây, đập đá, nhặt đồ. | `PlayerStatsComponent`, Resource Nodes (Cây/Đá), HUD 4 thanh. | Vừa (M) |
-| **M5** | Inventory, Items & Crafting | Túi đồ, trang bị, công thức chế tạo, UI MVC / MVP. | Hệ thống Inventory, Item Definitions, UI Túi & Chế tạo. | Vừa (M) |
-| **M6** | World Prototype & Biome 1 | Level Design Biome 1 Rừng Rậm, Làng Khai Hoang, NavMesh, đo FPS. | Scene `Biome1_JungleVillage`, Spawner tài nguyên & quái. | Vừa (M) |
-| **M7** | Day/Night, Moon Cycle & Blood Moon | Đồng hồ thế giới, chu kỳ trăng, ánh sáng đêm đỏ, quái tấn công làng. | `GameTimeManager`, `MoonPhaseSystem`, `NightRaidDirector`. | Vừa (M) |
-| **M8** | **Vertical Slice** | **Ghép toàn bộ M1–M7 thành game chơi được từ đầu đến cuối.** | **Bản build `VerticalSlice_v0.1.exe` hoàn chỉnh.** | **Cao (L)** |
-| **M9** | NPC & Village Simulation | Lịch sinh hoạt dân làng, kho lương làng, Công Trình Sư sửa rào. | `NPCScheduleController`, `VillageManager`, NPC thợ mộc. | Cao (L) |
-| **M10** | Werewolf Deception System | Thương nhân Du Mục thật/giả, bẫy hàng hóa, 3 tầng phát hiện, phạt 7 ngày. | `TraderIdentityComponent`, Đuốc Ngải Cứu, Gương Đồng, Chuông Gió. | Cao (L) |
-| **M11** | RPG Progression & Mastery | Bảng thông thạo Albion (5 nhánh), 3 chuyên môn hóa, khảm Ngũ Linh Thạch. | `MasterySystem`, Cây kỹ năng vũ khí, Status Effects nguyên tố. | Cao (L) |
-| **M12** | Base Building, Traps & Raids | Dựng 5 cấp tường thành, bẫy tre trúc, tháp nỏ, AI nhảy tường / phá tường. | `BuildingPlacementSystem`, Lũy Tre, Giàn Ná Lưới Bạc, Bẫy Chông. | Rất cao (XL) |
-| **M13** | 5 Biomes & Underground Mines | Mở rộng 5 Biomes Việt Nam, 4 tầng hầm mỏ, Tộc Huyết Thi, 9 Bậc Sói. | Cổng chuyển vùng, 5 Scenes Biome, Boss Hầm Ngầm, Sói Vua. | Rất cao (XL) |
-| **M14** | Factions & 4 Endings | Người Lùn 3 cấp, Phù Thủy, Hội Săn Sói, Hợp Thể Người-Sói, 4 Endings. | `FactionReputationSystem`, Vũ Khí Huyền Thoại, 4 kịch bản kết thúc. | Cao (L) |
-| **M15** | Persistence, QA & Release | Save/Load có versioning, Object Pooling, Quality Settings, Standalone Build. | Game hoàn chỉnh, hệ thống lưu trữ toàn diện, tối ưu 60+ FPS. | Cao (L) |
+## 3. Người chịu trách nhiệm, AI và capacity
 
----
+6 người đều chưa có kinh nghiệm game; các vai trò sau là trách nhiệm học và kiểm chứng, **không phải tuyên bố có senior chuyên môn**.
 
-## 3. Phân Chia Vai Trò Cho Đội Ngũ 6 Thành Viên (Team Work Breakdown)
+| Người / vai trò | Phạm vi | Sản phẩm bàn giao |
+| --- | --- | --- |
+| 1 — Lead/Producer | Core/networking, contract, tích hợp | Spike evidence, decision log, build gate; dành giờ học Unity/networking. |
+| 2 — Systems | Combat/stats/inventory/mastery/death | Pure logic, config, invariant tests, integration scene. |
+| 3 — World/AI | Navigation, raid, supply, king AI | FSM/director có replay log, tải đại diện. |
+| 4 — Art/audio pipeline | AI asset, rig/animation, VFX/SFX | Asset nhẹ, nhất quán, import được; manifest nguồn/quyền sử dụng, không chỉ ảnh concept. |
+| 5 — Level/Narrative implementation | World layout, NPC/quest graph | Một chương chơi được, clue placement, dialogue; ghi rõ thời gian narrative design. |
+| 6 — UI/QA coordination | UI, onboarding, test matrix | Build test report, luồng lỗi, playtest; cả đội vẫn phải test chéo. |
 
-Với đội ngũ 6 người kết hợp cùng 2 AI (GPT-6 Astra & Gemini 4 Argon), dự án được phân công trách nhiệm rõ ràng để tránh xung đột file trong Git:
+288 giờ/tuần là tổng giờ danh nghĩa. Baseline phân bổ thử: 30% học/spike, 40% làm/tích hợp, 20% kiểm thử/review, 10% điều phối/tài liệu; đo lại hàng tuần. Không quy đổi 2 AI thành 2 dev kinh nghiệm. Ước lượng 8–12 tuần trong review trước đó không còn là baseline vì đã thêm 6-player migration, phe ẩn và biết đội mới hoàn toàn.
 
-| Vai trò | Phụ trách chính | Trách nhiệm cụ thể | Vùng làm việc trong Git |
-| :--- | :--- | :--- | :--- |
-| **1. Lead Architect / Gameplay Programmer (Bạn)** | Kiến trúc Core & Review | Quản lý kiến trúc tổng thể, tích hợp hệ thống, điều phối AI và review code của team. | `Assets/_Project/Scripts/Core/`, `docs/` |
-| **2. Gameplay & Systems Programmer** | Combat & Survival | Lập trình logic di chuyển, chiến đấu, 4 thanh trạng thái, Inventory và Crafting. | `Assets/_Project/Scripts/Combat/`, `Player/`, `Inventory/` |
-| **3. AI & World Programmer** | Quái vật, NPC & Hệ thống Đêm | Lập trình AI FSM Sói, lịch sinh hoạt dân làng, chu kỳ trăng, cơ chế giả dạng và AI công thành. | `Assets/_Project/Scripts/AI/`, `World/`, `Factions/` |
-| **4. Technical Artist & Asset Pipeline** | Model 3D, Rigging & Animation | Chuẩn hóa model Low-Poly / Stylized, gắn xương qua Mixamo, cấu hình Animator Controller, VFX URP. | `Assets/_Project/Art/Characters/`, `Props/`, `VFX/` |
-| **5. Level Designer & Environment Artist** | Dựng Scene & Modular World | Dựng địa hình 5 Biomes, bố trí làng, đặt Spawner, nướng NavMesh và cấu hình ánh sáng URP. | `Assets/_Project/Scenes/`, `Prefabs/Environment/` |
-| **6. UI/UX & QA Tester** | Giao diện & Kiểm thử hệ thống | Thiết kế UI Canvas, HUD 4 thanh, bảng Inventory/Crafting, viết kịch bản test và chạy test thủ công. | `Assets/_Project/Art/UI/`, `Scripts/UI/`, `docs/qa/` |
+Hai tuần đầu sau quyết định: kiểm chứng M5, học ownership/state và spike M6N; cuối kỳ báo số giờ thực/khối lượng còn lại, chưa hứa hoàn thành M6N trong hai tuần. Chỉ estimate 1–2 milestone trước mắt sau spike, dùng range và buffer cho lỗi chưa biết.
 
----
+## 4. DoD chung
 
-## 4. Quy Tắc Bất Biến Giữa Các Milestone
-1. **Definition of Done (DoD):** Mỗi task chỉ được đánh dấu là hoàn thành khi:
-   * Code compile 0 lỗi trên Unity Console.
-   * Chạy trực tiếp trên Scene thử nghiệm không phát sinh Exception.
-   * Có Unit Test cho logic tính toán độc lập.
-   * Đã cập nhật trạng thái vào `docs/handoff/CURRENT_STATE.md`.
-2. **Kiểm Soát Xung Đột Scene trong Git:** Không bao giờ để 2 thành viên cùng chỉnh sửa chung một file `.unity`. Sử dụng **Prefab-based Workflow** (mỗi người làm việc trên Prefab riêng, sau đó kéo vào Scene chính).
-
+- Compile không lỗi, standalone chạy ngoài Editor; mỗi task có owner/commit/build ID.
+- Test ý nghĩa cho invariant: không nhân đôi/mất đồ, outcome một lần, private state không broadcast, save/migration giữ đúng dữ liệu.
+- Playtest thật cho cảm giác đòn/nhận diện clue/readability; AI tự nói “pass” không thay log hoặc người chơi.
+- Thay đổi contract/schema cần review trước tích hợp. Một người sở hữu scene tại một thời điểm, Prefab-based workflow; không cho nhiều AI cùng sửa một scene.
+- Update CURRENT_STATE theo bằng chứng, không theo phần trăm code được AI sinh. Asset/audio phải kiểm tra import, chất lượng, kích thước và quyền sử dụng.

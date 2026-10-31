@@ -183,13 +183,15 @@ namespace HuyetNguyetDaiNgan.Inventory
         {
             RecipeCache.Clear();
 
-            var wood = GetItem("resource_wood");
-            var stone = GetItem("resource_stone");
-            var berry = GetItem("resource_berry");
-            var rice = GetItem("consumable_bamboo_rice");
-            var axe = GetItem("tool_stone_axe_t1");
-            var torch = GetItem("tool_torch_t1");
-            var sword = GetItem("weapon_sword_iron_t1");
+            // Không gọi GetItem ở đây: GetItem gọi EnsureInitialized và sẽ đệ quy vô hạn
+            // khi database đang ở giữa lần khởi tạo đầu tiên.
+            var wood = ItemCache["resource_wood"];
+            var stone = ItemCache["resource_stone"];
+            var berry = ItemCache["resource_berry"];
+            var rice = ItemCache["consumable_bamboo_rice"];
+            var axe = ItemCache["tool_stone_axe_t1"];
+            var torch = ItemCache["tool_torch_t1"];
+            var sword = ItemCache["weapon_sword_iron_t1"];
 
             // 1. Rìu Đá (3 Gỗ + 2 Đá)
             var rAxe = ScriptableObject.CreateInstance<CraftingRecipeSO>();

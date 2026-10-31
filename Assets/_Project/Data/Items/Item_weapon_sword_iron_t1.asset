@@ -25,4 +25,4 @@ MonoBehaviour:
   hungerRestore: 0
   staminaRestore: 0
   manaRestore: 0
-  weaponData: {fileID: 0}
+  weaponData: {fileID: 11400000, guid: 5f17a19fd179db640bdd8b610cb570d2, type: 2}

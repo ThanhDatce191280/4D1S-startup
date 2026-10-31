@@ -8,8 +8,8 @@ namespace HuyetNguyetDaiNgan.Inventory
 {
     /// <summary>
     /// Hệ thống Quản Lý Túi Đồ của người chơi:
-    /// - 6 Ô Hotbar bên ngoài (Index 0 đến 5, gán phím số 1 đến 6).
-    /// - 20 Ô Ba Lô bên trong (Index 6 đến 25).
+    /// - Tổng cộng đúng 20 ô theo phạm vi M5.
+    /// - 6 ô đầu (Index 0 đến 5) đồng thời là ô dùng nhanh, không phải 6 ô chứa thêm.
     /// Xử lý lưu trữ, cộng dồn, hoán đổi 2 chiều và sử dụng trực tiếp.
     /// </summary>
     public class InventorySystem : MonoBehaviour
@@ -18,8 +18,8 @@ namespace HuyetNguyetDaiNgan.Inventory
         public const int BagSlots = 20;
 
         [Header("Inventory Settings")]
-        [Tooltip("Tổng số ô (6 Hotbar + 20 Ba Lô = 26 ô)")]
-        [SerializeField] private int totalSlots = 26;
+        [Tooltip("Tổng số ô túi đồ M5 (6 ô đầu là hotbar)")]
+        [SerializeField] private int totalSlots = BagSlots;
 
         [Tooltip("Danh sách các ô trong túi đồ")]
         [SerializeField] private InventorySlot[] slots;
@@ -28,6 +28,7 @@ namespace HuyetNguyetDaiNgan.Inventory
         private HealthComponent _healthComponent;
         private PlayerStatsComponent _statsComponent;
         private PlayerCombatController _combatController;
+        private string _equippedItemId;
 
         // Events
         public event Action OnInventoryChanged;
@@ -51,7 +52,7 @@ namespace HuyetNguyetDaiNgan.Inventory
             if (_statsComponent == null) _statsComponent = GetComponent<PlayerStatsComponent>() ?? FindFirstObjectByType<PlayerStatsComponent>();
             if (_combatController == null) _combatController = GetComponent<PlayerCombatController>() ?? FindFirstObjectByType<PlayerCombatController>();
 
-            // Luôn đảm bảo 26 ô (6 Hotbar + 20 Ba Lô)
+            // Luôn đảm bảo đúng 20 ô. Hotbar chỉ tham chiếu 6 ô đầu.
             InitializeSlots();
 
             // Tự động cấp vật phẩm khởi đầu nếu túi còn trống
@@ -68,7 +69,7 @@ namespace HuyetNguyetDaiNgan.Inventory
                 if (sword != null) slots[1].SetItem(sword, 1);
                 if (berry != null) slots[2].SetItem(berry, 5);
 
-                // Đặt nguyên liệu vào Ba lô
+                // Đặt nguyên liệu vào các ô còn lại của túi
                 if (wood != null) slots[6].SetItem(wood, 5);
                 if (stone != null) slots[7].SetItem(stone, 4);
                 if (rice != null) slots[8].SetItem(rice, 2);
@@ -89,7 +90,7 @@ namespace HuyetNguyetDaiNgan.Inventory
 
         public void InitializeSlots()
         {
-            totalSlots = 26; // Bắt buộc cố định 26 ô: 6 Hotbar (0..5) + 20 Ba Lô (6..25)
+            totalSlots = BagSlots;
             if (slots == null || slots.Length != totalSlots)
             {
                 var oldSlots = slots;
@@ -114,7 +115,9 @@ namespace HuyetNguyetDaiNgan.Inventory
         public bool TryAddItem(ItemDataSO item, int amount, out int remainder)
         {
             remainder = amount;
-            if (item == null || amount <= 0) return false;
+            if (!IsValidItem(item) || amount <= 0) return false;
+
+            InitializeSlots();
 
             // 1. Cộng dồn vào các ô hiện có cùng loại chưa đầy stack
             for (int i = 0; i < totalSlots; i++)
@@ -163,6 +166,8 @@ namespace HuyetNguyetDaiNgan.Inventory
         {
             if (string.IsNullOrEmpty(itemId)) return 0;
 
+            InitializeSlots();
+
             int count = 0;
             for (int i = 0; i < totalSlots; i++)
             {
@@ -184,6 +189,7 @@ namespace HuyetNguyetDaiNgan.Inventory
         /// </summary>
         public bool TryRemoveItem(string itemId, int amount = 1)
         {
+            if (string.IsNullOrWhiteSpace(itemId) || amount <= 0) return false;
             if (!HasItem(itemId, amount)) return false;
 
             int remainingToRemove = amount;
@@ -203,7 +209,124 @@ namespace HuyetNguyetDaiNgan.Inventory
             }
 
             OnInventoryChanged?.Invoke();
+            EnsureEquippedItemStillOwned();
             return true;
+        }
+
+        /// <summary>
+        /// Tách đúng số lượng từ một stack sang một ô trống. Không thay đổi gì nếu thao tác không hợp lệ.
+        /// </summary>
+        public bool TrySplitStack(int fromIndex, int toIndex, int amount)
+        {
+            InventorySlot fromSlot = GetSlot(fromIndex);
+            InventorySlot toSlot = GetSlot(toIndex);
+            if (fromSlot == null || toSlot == null || fromIndex == toIndex || amount <= 0) return false;
+            if (fromSlot.IsEmpty || !toSlot.IsEmpty || amount >= fromSlot.Quantity) return false;
+
+            ItemDataSO item = fromSlot.Item;
+            if (!IsValidItem(item) || amount > item.maxStackSize) return false;
+
+            fromSlot.RemoveQuantity(amount);
+            toSlot.SetItem(item, amount);
+            OnInventoryChanged?.Invoke();
+            return true;
+        }
+
+        /// <summary>
+        /// Kiểm tra một giao dịch trừ nhiều item và thêm thành phẩm trên bản sao túi đồ.
+        /// Dùng cùng thuật toán với commit để tránh trường hợp kiểm tra và thực thi lệch nhau.
+        /// </summary>
+        public bool CanApplyTransaction(IReadOnlyDictionary<string, int> removals, ItemDataSO resultItem, int resultAmount)
+        {
+            return TrySimulateTransaction(removals, resultItem, resultAmount, out _, out _);
+        }
+
+        /// <summary>
+        /// Commit giao dịch inventory nguyên tử. Nếu không chứa được thành phẩm hoặc dữ liệu sai,
+        /// toàn bộ túi giữ nguyên và không phát sự kiện thay đổi.
+        /// </summary>
+        public bool TryApplyTransaction(IReadOnlyDictionary<string, int> removals, ItemDataSO resultItem, int resultAmount)
+        {
+            if (!TrySimulateTransaction(removals, resultItem, resultAmount, out ItemDataSO[] simulatedItems, out int[] simulatedQuantities))
+            {
+                return false;
+            }
+
+            for (int i = 0; i < totalSlots; i++)
+            {
+                slots[i].SetItem(simulatedItems[i], simulatedQuantities[i]);
+            }
+
+            EnsureEquippedItemStillOwned();
+            OnInventoryChanged?.Invoke();
+            return true;
+        }
+
+        private bool TrySimulateTransaction(
+            IReadOnlyDictionary<string, int> removals,
+            ItemDataSO resultItem,
+            int resultAmount,
+            out ItemDataSO[] simulatedItems,
+            out int[] simulatedQuantities)
+        {
+            simulatedItems = null;
+            simulatedQuantities = null;
+            if (removals == null || removals.Count == 0 || !IsValidItem(resultItem) || resultAmount <= 0) return false;
+
+            InitializeSlots();
+            simulatedItems = new ItemDataSO[totalSlots];
+            simulatedQuantities = new int[totalSlots];
+            for (int i = 0; i < totalSlots; i++)
+            {
+                simulatedItems[i] = slots[i].Item;
+                simulatedQuantities[i] = slots[i].Quantity;
+            }
+
+            foreach (KeyValuePair<string, int> removal in removals)
+            {
+                if (string.IsNullOrWhiteSpace(removal.Key) || removal.Value <= 0) return false;
+
+                int remaining = removal.Value;
+                for (int i = totalSlots - 1; i >= 0 && remaining > 0; i--)
+                {
+                    if (simulatedItems[i] == null || simulatedQuantities[i] <= 0 || simulatedItems[i].itemId != removal.Key) continue;
+
+                    int removed = Mathf.Min(simulatedQuantities[i], remaining);
+                    simulatedQuantities[i] -= removed;
+                    remaining -= removed;
+                    if (simulatedQuantities[i] == 0)
+                    {
+                        simulatedItems[i] = null;
+                    }
+                }
+
+                if (remaining > 0) return false;
+            }
+
+            int resultRemaining = resultAmount;
+            for (int i = 0; i < totalSlots && resultRemaining > 0; i++)
+            {
+                ItemDataSO existing = simulatedItems[i];
+                if (existing == null || simulatedQuantities[i] <= 0 || existing.itemId != resultItem.itemId) continue;
+                if (!AreCompatibleItemDefinitions(existing, resultItem)) return false;
+
+                int space = Mathf.Max(0, existing.maxStackSize - simulatedQuantities[i]);
+                int added = Mathf.Min(space, resultRemaining);
+                simulatedQuantities[i] += added;
+                resultRemaining -= added;
+            }
+
+            for (int i = 0; i < totalSlots && resultRemaining > 0; i++)
+            {
+                if (simulatedItems[i] != null && simulatedQuantities[i] > 0) continue;
+
+                int added = Mathf.Min(resultItem.maxStackSize, resultRemaining);
+                simulatedItems[i] = resultItem;
+                simulatedQuantities[i] = added;
+                resultRemaining -= added;
+            }
+
+            return resultRemaining == 0;
         }
 
         /// <summary>
@@ -246,10 +369,10 @@ namespace HuyetNguyetDaiNgan.Inventory
         /// <summary>
         /// Sử dụng hoặc trang bị vật phẩm tại ô chỉ định.
         /// </summary>
-        public void UseItem(int slotIndex)
+        public bool UseItem(int slotIndex)
         {
             InventorySlot slot = GetSlot(slotIndex);
-            if (slot == null || slot.IsEmpty) return;
+            if (slot == null || slot.IsEmpty || !IsValidItem(slot.Item)) return false;
 
             ItemDataSO item = slot.Item;
 
@@ -263,20 +386,12 @@ namespace HuyetNguyetDaiNgan.Inventory
                     float healAmount = item.healthRestore;
                     float hungerAmount = item.hungerRestore;
 
-                    // Fallback bảo hiểm chỉ số chuẩn
-                    if (item.itemId == "consumable_bamboo_rice")
+                    bool hasConfiguredEffect = healAmount > 0f || hungerAmount > 0f || item.staminaRestore > 0f || item.manaRestore > 0f;
+                    bool hasRequiredTarget = (healAmount <= 0f || _healthComponent != null)
+                        && ((hungerAmount <= 0f && item.staminaRestore <= 0f && item.manaRestore <= 0f) || _statsComponent != null);
+                    if (!hasConfiguredEffect || !hasRequiredTarget || (_healthComponent != null && _healthComponent.IsDead))
                     {
-                        if (healAmount <= 0f) healAmount = 30f;
-                        if (hungerAmount <= 0f) hungerAmount = 45f;
-                    }
-                    else if (item.itemId == "resource_berry")
-                    {
-                        if (healAmount <= 0f) healAmount = 5f;
-                        if (hungerAmount <= 0f) hungerAmount = 15f;
-                    }
-                    else
-                    {
-                        if (hungerAmount <= 0f) hungerAmount = 25f;
+                        return false;
                     }
 
                     if (_healthComponent != null && healAmount > 0f)
@@ -289,7 +404,11 @@ namespace HuyetNguyetDaiNgan.Inventory
                     }
                     if (_statsComponent != null && item.staminaRestore > 0f)
                     {
-                        _statsComponent.TryConsumeStamina(-item.staminaRestore);
+                        _statsComponent.RestoreStamina(item.staminaRestore);
+                    }
+                    if (_statsComponent != null && item.manaRestore > 0f)
+                    {
+                        _statsComponent.RestoreMana(item.manaRestore);
                     }
 
                     slot.RemoveQuantity(1);
@@ -297,7 +416,7 @@ namespace HuyetNguyetDaiNgan.Inventory
 
                     OnInventoryChanged?.Invoke();
                     OnItemUsed?.Invoke(slotIndex, item);
-                    break;
+                    return true;
 
                 case ItemType.Weapon:
                 case ItemType.Tool:
@@ -308,11 +427,40 @@ namespace HuyetNguyetDaiNgan.Inventory
                         if (weapon != null)
                         {
                             _combatController.EquipWeapon(weapon);
+                            _equippedItemId = item.itemId;
                             OnItemUsed?.Invoke(slotIndex, item);
+                            return true;
                         }
                     }
-                    break;
+                    return false;
             }
+
+            return false;
+        }
+
+        private static bool IsValidItem(ItemDataSO item)
+        {
+            return item != null && !string.IsNullOrWhiteSpace(item.itemId) && item.maxStackSize > 0;
+        }
+
+        private static bool AreCompatibleItemDefinitions(ItemDataSO left, ItemDataSO right)
+        {
+            return left != null
+                && right != null
+                && left.itemId == right.itemId
+                && left.itemType == right.itemType
+                && left.maxStackSize == right.maxStackSize;
+        }
+
+        private void EnsureEquippedItemStillOwned()
+        {
+            if (string.IsNullOrEmpty(_equippedItemId) || HasItem(_equippedItemId)) return;
+
+            if (_combatController != null)
+            {
+                _combatController.EquipWeapon(null);
+            }
+            _equippedItemId = null;
         }
     }
 }

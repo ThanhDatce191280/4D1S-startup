@@ -7,8 +7,7 @@ namespace HuyetNguyetDaiNgan.UI
 {
     /// <summary>
     /// Giao diện Túi Đồ & Bàn Chế Tạo Dân Gian:
-    /// - 6 Ô Hotbar bên ngoài (Index 0..5, phím tắt 1..6, click dùng trực tiếp ngoài màn hình).
-    /// - 20 Ô Ba Lô bên trong (Index 6..25).
+    /// - Túi có đúng 20 ô; 6 ô đầu cũng được chiếu lên hotbar (phím 1..6).
     /// - Chọn đồ và xem chi tiết an toàn, không bị nhầm lẫn với thao tác dời đồ.
     /// - Chức năng [⇄ CHUYỂN Ô] chuyển đồ 2 chiều giữa Ba Lô và 6 ô Hotbar.
     /// - Dùng đồ: Nút [SỬ DỤNG / ĂN NGAY], hoặc Click chuột phải, hoặc Nhấp đúp chuột.
@@ -60,6 +59,7 @@ namespace HuyetNguyetDaiNgan.UI
         private GUIStyle _closeBtnStyle;
 
         public static bool IsOpenGlobal { get; private set; }
+        private static InventoryCraftingUI _activeInstance;
 
         public bool IsOpen
         {
@@ -110,6 +110,14 @@ namespace HuyetNguyetDaiNgan.UI
 
         private void Awake()
         {
+            if (_activeInstance != null && _activeInstance != this)
+            {
+                Debug.LogError("[Inventory UI] Phát hiện nhiều InventoryCraftingUI. Instance trùng đã bị vô hiệu hóa.", this);
+                enabled = false;
+                return;
+            }
+
+            _activeInstance = this;
             _whiteTex = new Texture2D(1, 1);
             _whiteTex.SetPixel(0, 0, Color.white);
             _whiteTex.Apply();
@@ -124,12 +132,19 @@ namespace HuyetNguyetDaiNgan.UI
 
         private void OnDisable()
         {
-            IsOpenGlobal = false;
+            if (_activeInstance == this)
+            {
+                IsOpenGlobal = false;
+            }
         }
 
         private void OnDestroy()
         {
-            IsOpenGlobal = false;
+            if (_activeInstance == this)
+            {
+                _activeInstance = null;
+                IsOpenGlobal = false;
+            }
             if (_whiteTex != null)
             {
                 Destroy(_whiteTex);
@@ -357,7 +372,7 @@ namespace HuyetNguyetDaiNgan.UI
             // Đường kẻ ngăn cách tiêu đề
             DrawSolidRect(new Rect(startX + 16, startY + 34, windowWidth - 32, 1), _borderInner);
 
-            // Cột Trái: Hotbar (6 ô) + Ba Lô (20 ô) + Chi tiết vật phẩm
+            // Cột Trái: Hotbar chiếu 6 ô đầu + lưới đủ 20 ô + chi tiết vật phẩm
             float colLeftX = startX + 16f;
             float colLeftW = 290f;
             DrawInventoryColumn(colLeftX, startY + 42f, colLeftW, windowHeight - 78f);
@@ -455,9 +470,9 @@ namespace HuyetNguyetDaiNgan.UI
                 DrawSingleSlot(i, sx, hotbarStartY, hotbarSlotSize, (i + 1).ToString());
             }
 
-            // 2. BA LÔ TÚI ĐỒ (20 Ô)
+            // 2. TÚI ĐỒ (20 Ô, gồm cả 6 ô hotbar)
             float bagStartY = hotbarStartY + hotbarSlotSize + 10f;
-            GUI.Label(new Rect(x, bagStartY, width, 16), "🎒 BA LÔ TÚI ĐỒ (20 Ô)", _columnHeaderStyle);
+            GUI.Label(new Rect(x, bagStartY, width, 16), "🎒 TÚI ĐỒ (20 Ô • 6 Ô ĐẦU LÀ HOTBAR)", _columnHeaderStyle);
 
             float bagGridY = bagStartY + 19f;
             int cols = 5;
@@ -469,7 +484,7 @@ namespace HuyetNguyetDaiNgan.UI
             {
                 for (int c = 0; c < cols; c++)
                 {
-                    int index = InventorySystem.HotbarSlots + (r * cols + c); // Index 6..25
+                    int index = r * cols + c; // Index 0..19
                     float sx = x + c * (bagSlotSize + bagGap);
                     float sy = bagGridY + r * (bagSlotSize + bagGap);
                     DrawSingleSlot(index, sx, sy, bagSlotSize, null);
@@ -595,7 +610,7 @@ namespace HuyetNguyetDaiNgan.UI
             {
                 return $"Phím {slotIndex + 1}";
             }
-            return $"Ba Lô #{slotIndex - InventorySystem.HotbarSlots + 1}";
+            return $"Túi Đồ #{slotIndex + 1}";
         }
 
         /// <summary>
@@ -646,8 +661,8 @@ namespace HuyetNguyetDaiNgan.UI
             // Hiển thị chỉ số hồi phục nếu là Consumable
             if (item.itemType == ItemType.Consumable)
             {
-                float hunger = (item.itemId == "consumable_bamboo_rice") ? 45f : (item.itemId == "resource_berry" ? 15f : (item.hungerRestore > 0 ? item.hungerRestore : 20f));
-                float hp = (item.itemId == "consumable_bamboo_rice") ? 30f : (item.itemId == "resource_berry" ? 5f : (item.healthRestore > 0 ? item.healthRestore : 5f));
+                float hunger = item.hungerRestore;
+                float hp = item.healthRestore;
                 GUI.Label(new Rect(x + 10, y + 46, width - 170, 16), $"+{hunger} Độ No  •  +{hp} Máu", _statBonusStyle);
             }
 

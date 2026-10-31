@@ -1,6 +1,8 @@
 # Glossary & Domain Model Mapping (Từ Điển Dự Án)
 
-**Dự án:** Huyết Nguyệt Đại Ngàn  
+**Dự án:** Huyết Nguyệt Đại Ngàn
+
+**Canon 31/10/2026:** `docs/vision/PRODUCT_CANON.md` ưu tiên về nghĩa/luật. Tên mới dưới đây là hợp đồng thiết kế đề xuất, chưa chứng minh class tồn tại; kiểm mã nguồn trước đổi API.
 **Mục đích:** Nguồn tham chiếu danh pháp duy nhất (*Single Source of Truth*) ánh xạ giữa thuật ngữ tiếng Việt trong GDD và tên Class / Enum / ScriptableObject trong mã nguồn C#.
 
 > **Quy tắc bắt buộc:** Cả 6 thành viên trong team, GPT-6 Astra và Gemini 4 Argon **phải sử dụng chính xác** các tên tiếng Anh dưới đây trong code để tránh xung đột mã nguồn.
@@ -57,7 +59,7 @@
 | Bậc 7 | Nguyên Tố Lang | `WerewolfTier.Tier7_Elemental` | `Enemy_Werewolf_Tier7_Elemental` |
 | Bậc 8 | Cổ Huyết Lang Tổ | `WerewolfTier.Tier8_AncientAlpha`| `Enemy_Werewolf_Tier8_Behemoth` (Kháng bẫy, gầm hoảng sợ) |
 | Bậc 9 | Sói Vua | `WerewolfTier.Tier9_WolfKing` | `Boss_WolfKing` (Sở hữu Mana, buff x3 bầy sói) |
-| Cấp 10 | Thần Sói Cổ Đại | `WerewolfTier.Tier10_AncientGod`| `Boss_AncientWolfGod` (Thực thể triệu hồi) |
+| Tier 10 | Sói Vua tiến hóa khi phe Sói thắng | `WorldOutcome.WolfDominion` + `WolfKingAscended` (tên đề xuất) | Trạng thái kết thúc/cinematic của cùng vua; không spawn boss triệu hồi để đánh tiếp. `Tier10_AncientGod` cũ là legacy, không tự rename code/save. |
 
 ---
 
@@ -111,3 +113,24 @@
 | Cơm Lam Ống Nứa | `consumable_bamboo_rice` | `ConsumableCategory.Food` |
 | Dầu Tràm Cổ | `consumable_cajeput_oil` | `ConsumableCategory.Medicine` |
 
+
+## 9. Session, phe và kết thúc — tên đề xuất mới
+
+| Khái niệm | Tên đề xuất | Quy tắc |
+| --- | --- | --- |
+| Người tạo world | `WorldOwnerId` | Không đồng nghĩa máy đang chạy authority. |
+| Máy mô phỏng | `AuthorityPeerId` | Một writer theo `AuthorityEpoch`/`CommitIndex`. |
+| Nhân vật bền vững | `PlayerId` | Không đổi theo kết nối mới. |
+| Phe thật | `TrueFaction` | State riêng; không dùng màu party công khai. |
+| Vỏ bọc | `CoverIdentity` | Người khác quan sát được. |
+| Hình dạng | `BodyForm` | Human/Hybrid/Wolf, tách allegiance. |
+| Mộ | `GraveId`, `DeathId` | Inventory/equipment chuyển nguyên tử; không duplicate qua migration. |
+| Hồi sinh | `ResurrectionState` | Channel/cost/cooldown authority quyết định. |
+| Kết cục world | `WorldOutcome` | WolfKingSlain/WolfDominion/PartyWipe; có outcome flags cho sự kiện cùng tick. |
+| Thành tựu cá nhân | `PersonalAchievementState` | Không đảo ngược outcome chung. |
+| Sổ đá hữu hạn | `FiniteStoneLedger`, `StoneInstanceId` | Một quota/world cho mọi nguồn loot/quest/trade. |
+| Chỉ huy Sói Vua | `WolfKingDirector` | Tactics hữu hạn, ký ức raid trong world; không đồng nghĩa LLM runtime. |
+
+## 10. Schema cần đối chiếu mã nguồn trước triển khai
+
+DamageInfo trong bảng cũ dùng `type`, M3 plan dùng `damageType` và `hitPoint`: chưa tự chốt tên bằng sửa tài liệu. M5R phải kiểm API hiện hành, chọn một schema và adapter network dùng entity ID thay tham chiếu GameObject qua mạng. ResourceNode/WorldItemPickup là thành phần M4; item, grave, player và event phải có ID bền vững trước migration.

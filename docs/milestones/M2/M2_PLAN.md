@@ -1,3 +1,5 @@
+> **Đối chiếu 31/10/2026:** COMPLETED theo CURRENT_STATE; chưa tái nghiệm thu trong lần cập nhật tài liệu. Nội dung bên dưới là plan prototype lịch sử; chưa bao phủ LAN/host migration/phe ẩn mới. Canon tại `docs/vision/PRODUCT_CANON.md`, phần còn thiếu được kiểm ở M5R và roadmap mới.
+
 # Kế Hoạch Triển Khai Chi Tiết: Milestone M2 (3D Character Controller & Isometric Camera)
 
 **Dự án:** Huyết Nguyệt Đại Ngàn  

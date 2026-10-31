@@ -1,3 +1,5 @@
+> **Đối chiếu 31/10/2026:** READY_FOR_VERIFICATION theo CURRENT_STATE; checklist cũ không thay bằng chứng build. Nội dung bên dưới là plan prototype lịch sử; chưa bao phủ LAN/host migration/phe ẩn mới. Canon tại `docs/vision/PRODUCT_CANON.md`, phần còn thiếu được kiểm ở M5R và roadmap mới.
+
 # Kế Hoạch Triển Khai Chi Tiết: Milestone M5 (Inventory, Items & Crafting)
 
 **Dự án:** Huyết Nguyệt Đại Ngàn  

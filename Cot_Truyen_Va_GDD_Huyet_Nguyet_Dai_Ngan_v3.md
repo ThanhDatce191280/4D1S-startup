@@ -1,3 +1,5 @@
+> **Cập nhật canon 31/10/2026:** Tài liệu này giữ nội dung nền v3 để truy vết, không còn là nguồn quyết định cao nhất. Xem [Product Canon](docs/vision/PRODUCT_CANON.md), đặc biệt bảng thay thế §4. Canon hiện hành: 3D zone-based; LAN 4–6 có host migration; phe cá nhân có thể ẩn; Mana dạng Sói và use-based mastery; vua tier9 duy nhất chết là endgame, Sói thắng thì vua tiến tier10 và endgame; chết rơi đồ vào mộ, phép đồng đội hồi sinh, team wipe là bad ending; Linh Thạch nhiều viên nhưng hữu hạn theo world. Các đoạn 2D, vua tái sinh mỗi trăng, Sói không Mana, triệu hồi boss tier10 đánh tiếp và 4 ending cũ phía dưới là **nội dung lịch sử bị thay thế**, không được triển khai khi trái canon. Phạm vi demo và gate M8 mới tại [MVP Scope](docs/vision/MVP_SCOPE.md).
+
 # <span style="color:#fcd34d">GAME DESIGN DOCUMENT (GDD) & CỐT TRUYỆN HOÀN CHỈNH</span>
 
 # HUYẾT NGUYỆT ĐẠI NGÀN
@@ -19,6 +21,7 @@ Hàng ngàn năm trước, vùng đất Đại Ngàn sống trong sự hòa hợ
 Mỗi chu kỳ trăng, một cá thể mang dòng máu thuần khiết nhất sẽ thức tỉnh thành 'Sói Vua'. Lúc mới sinh ra, Sói Vua rất yếu ớt, ẩn mình trong bóng tối và được bầy sói con đi săn mồi đem về nuôi dưỡng. Ngày qua ngày, bầy Người Sói không chỉ mạnh lên về cơ bắp mà còn tiến hóa trí khôn: chúng biết lột da những Người Du Mục xấu số để trà trộn vào các ngôi làng ban ngày, buôn bán và dò xét sơ hở của con người, chờ đêm xuống lại hóa thú đồ sát.
 
 Người chơi khởi đầu là một Dân Làng trẻ tuổi vừa đặt chân đến ngôi làng khai hoang giữa Rừng Rậm. Đứng trước nguy cơ Sói Vua trưởng thành và thống lĩnh đại quân xóa sổ nhân loại, bạn nắm trong tay vận mệnh của cả vùng đất với 3 ngả rẽ: Bảo vệ ngôi làng và rèn thần binh diệt Sói; Phản bội nhân loại để bước lên ngôi vị Chúa Tể Bầy Sói; hoặc gia nhập Tổ Chức Săn Sói của Liên Hiệp Làng với âm mưu dùng 9 Bậc Sói để triệu hồi lại Thần Sói Cấp 10.
+
 
 ## <span style="color:#7f1d1d">1.3. Diễn biến Cốt truyện theo 4 Hồi (4-Act Progression)</span>
 

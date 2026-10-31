@@ -25,8 +25,7 @@ namespace HuyetNguyetDaiNgan.Inventory
 
         public InventorySlot(ItemDataSO newItem, int initialQuantity)
         {
-            item = newItem;
-            quantity = Mathf.Max(0, initialQuantity);
+            SetItem(newItem, initialQuantity);
         }
 
         /// <summary>
@@ -72,13 +71,14 @@ namespace HuyetNguyetDaiNgan.Inventory
 
         public void SetItem(ItemDataSO newItem, int newQuantity)
         {
-            item = newItem;
-            quantity = Mathf.Max(0, newQuantity);
-
-            if (item == null)
+            if (newItem == null || newQuantity <= 0 || newItem.maxStackSize <= 0)
             {
                 Clear();
+                return;
             }
+
+            item = newItem;
+            quantity = Mathf.Min(newQuantity, newItem.maxStackSize);
         }
 
         public void Clear()

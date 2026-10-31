@@ -77,29 +77,8 @@ namespace HuyetNguyetDaiNgan.World
 
                 if (Vector3.Distance(transform.position, playerCenter) < 0.4f)
                 {
-                    // 1. Nạp vào InventorySystem (tự động gắn component nếu Player chưa có)
                     var inv = _targetPlayer.GetComponent<InventorySystem>();
-                    if (inv == null)
-                    {
-                        inv = _targetPlayer.gameObject.AddComponent<InventorySystem>();
-                        inv.InitializeSlots();
-                    }
-
-                    ItemDataSO toAdd = itemData;
-                    if (toAdd == null)
-                    {
-                        toAdd = ItemDatabase.GetItemByResourceType(resourceType);
-                    }
-
-                    if (toAdd != null && inv != null)
-                    {
-                        inv.TryAddItem(toAdd, amount);
-                    }
-
-                    // 2. Cập nhật PlayerStatsComponent
-                    _targetPlayer.AddResource(resourceType, amount);
-
-                    Destroy(gameObject);
+                    TryCollect(inv, _targetPlayer);
                 }
                 return;
             }
@@ -122,6 +101,45 @@ namespace HuyetNguyetDaiNgan.World
                     break;
                 }
             }
+        }
+
+        /// <summary>
+        /// Chuyển được bao nhiêu item thì chỉ giảm pickup bấy nhiêu. Phần dư luôn ở lại world.
+        /// Tách hàm này khỏi Update để kiểm thử giao dịch pickup mà không phụ thuộc vật lý/frame timing.
+        /// </summary>
+        public int TryCollect(InventorySystem inventory, PlayerStatsComponent stats)
+        {
+            if (inventory == null || amount <= 0) return 0;
+
+            ItemDataSO toAdd = itemData != null ? itemData : ItemDatabase.GetItemByResourceType(resourceType);
+            if (toAdd == null) return 0;
+
+            inventory.TryAddItem(toAdd, amount, out int remainder);
+            int accepted = amount - remainder;
+            if (accepted <= 0)
+            {
+                _targetPlayer = null;
+                _spawnPosition = transform.position;
+                return 0;
+            }
+
+            amount = remainder;
+            if (stats != null)
+            {
+                stats.AddResource(resourceType, accepted);
+            }
+
+            if (amount <= 0)
+            {
+                Destroy(gameObject);
+            }
+            else
+            {
+                _targetPlayer = null;
+                _spawnPosition = transform.position;
+            }
+
+            return accepted;
         }
 
         private void OnDrawGizmosSelected()

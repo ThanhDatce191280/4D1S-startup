@@ -2,7 +2,7 @@
 
 **Dự án:** Huyết Nguyệt Đại Ngàn  
 **Ngày cập nhật:** 31/10/2026  
-**Chế độ hiện tại:** `MODE A — ROADMAP` $\to$ Chuẩn bị sang `MODE D — IMPLEMENT: M1`
+**Chế độ hiện tại:** Cập nhật baseline sau review; nghiệm thu M5 rồi M5R → M6N. Chưa triển khai gameplay mới trong đợt cập nhật tài liệu.
 
 ---
 
@@ -12,7 +12,7 @@
 * **Hệ điều hành:** Windows 11.
 * **Game Engine:** Unity 6 LTS (`6000.3.27f1`) cài đặt tại `C:\Program Files\Unity\Hub\Editor\6000.3.27f1\Editor\Unity.exe`.
 * **Công cụ cài đặt:** Unity Hub, Unity Editor 6000.3.27f1, Git 2.49.0, Git LFS 3.6.1, VS Code 1.143.1.
-* **Quỹ thời gian:** 48 giờ / tuần (Toàn thời gian).
+* **Quỹ thời gian:** 48 giờ/người/tuần × 6 = 288 giờ danh nghĩa; tất cả chưa có kinh nghiệm Unity/networking/art/QA. Code gần 100% dùng AI, art/audio AI tự làm, không thuê ngoài.
 * **Quy mô đội ngũ:** 6 thành viên (phân bổ theo 6 vai trò trong `PROJECT_ROADMAP.md`).
 * **AI Coding Assistants:** GPT-6 Astra & Gemini 4 Argon.
 
@@ -40,16 +40,18 @@
 
 ---
 
-## 3. Các Quyết Định Kỹ Thuật Đã Được Phê Duyệt (Approved Decisions)
+## 3. Baseline hiện hành
 
-1. **Engine & Render:** Unity 6 LTS (6000.3.27f1) + URP + C# (.NET Standard 2.1).
-2. **Camera & Art:** 3D Stylized Low/Mid-Poly, camera Isometric / 3/4 cố định góc nhìn (kiểu Albion Online, không xoay 360 độ tự do).
-3. **Thế giới & Hầm mỏ:** Mô hình Zone-based World kết nối qua cổng chuyển vùng + Cửa Hầm Mỏ chuyển tầng địa chất (Instanced Underground Sub-scenes) + Cơ chế Độn Thổ (Burrow State) cho quái đào hầm.
-4. **Sói Vua & Vòng lặp Sinh tồn Hardcore:** Sói Vua tăng chỉ số vĩnh viễn mỗi đêm không đặt trần (Fail Condition chủ ý); người chơi phải tích cực Đánh Phủ Đầu chặn nguồn thịt ban đêm hoặc chấp nhận thất bại để rút kinh nghiệm cho màn chơi sau.
-5. **Hệ thống Nghi kỵ & Phát hiện Sói:** Chuẩn hóa 3 tầng (Cảnh báo diện rộng $\to$ Nghi vấn hàng hóa $\to$ Xác thực tốn tài nguyên) + Hình phạt chém nhầm Người Du Mục thật là thương đoàn ngừng ghé làng trong 7 ngày.
-6. **Mana, Hóa Sói & Albion Mastery:** Người Sói không giới hạn Stamina nhưng có Mana. Mana đóng vai trò thời gian duy trì hóa Sói (rút dần theo giây) và dùng làm Huyết Năng cho kỹ năng Huyết Thống. Trang bị và kỹ năng tuân thủ triết lý Albion Equipment + Mastery.
-7. **Mô phỏng AI Thế giới (Hybrid Simulation):** Bộ lập lịch sự kiện (`WorldEventScheduler`) mô phỏng toán học ngầm để phe Sói/quái không ngừng tiến hóa; chỉ spawn thực thể 3D vật lý khi người chơi tiếp cận khu vực liên quan.
-8. **Chiến lược Đồ họa:** Dùng 3D Placeholder + Mixamo animations ở giai đoạn M1–M8 để tập trung 100% hoàn thành Vertical Slice (M8) trước khi đầu tư art chi tiết.
+Nguồn canon: `docs/vision/PRODUCT_CANON.md`; kỹ thuật: `TECHNICAL_DECISIONS.md`, `SESSION_AND_PERSISTENCE.md`; gameplay: `docs/design/FACTIONS_DEATH_AND_ENDGAME.md`.
+
+- LAN 4–6, host migration khi chủ phòng tắt máy; hết người/hết giờ thì save/dừng, không tick offline.
+- 3D zone-based, Mana dạng Sói, equipment/use-based mastery.
+- Chọn/giấu phe cá nhân; quest/achievement riêng, world vẫn chạy với người còn online.
+- Vua tier9 AI duy nhất/cận vệ; vua chết endgame; Sói thắng→tier10 endgame. Team wipe→bad ending.
+- Chết rơi toàn đồ vào mộ, cần phép đồng đội; không tự respawn/checkpoint revive.
+- Quota Linh Thạch đã chốt: Hỏa 5, Thủy 4, Mộc 3, Thổ 2, Hàn 1 — tổng 15 viên mỗi world.
+- M8 core sinh tồn/combat nội bộ; M12 demo một biome/một chương có làng/nghi kỵ/phe ẩn.
+- Chưa xác minh code đã đáp ứng baseline này; migration/quorum, cost hồi sinh, PvP permissions và máy tối thiểu cần spike/playtest.
 
 ---
 
@@ -64,7 +66,13 @@
 
 ---
 
-## 5. Hành Động Tiếp Theo (Next Action)
+## 5. Hành động tiếp theo
 
-* **Bắt đầu Milestone M1:** Tạo Unity Project chuẩn URP 3D bằng Unity Editor `6000.3.27f1`, thiết lập `.gitignore`, cấu trúc thư mục `Assets/_Project/`, cài đặt các package cốt lõi (`Input System`, `Cinemachine`, `AI Navigation`) và kiểm thử bản build `.exe` đầu tiên.
+1. Nghiệm thu M5 bằng build và log; giữ READY_FOR_VERIFICATION tới khi có bằng chứng.
+2. M5R: đối chiếu Roll/combo/Mana/equip, thống nhất contract mới và backlog.
+3. M6N: spike LAN/authority/save/host migration, ưu tiên trước world expansion; dùng `docs/milestones/M6N/M6N_PLAN.md`.
+4. Review lịch sử `docs/review/REVIEW_2026-10-31.md` giữ nguyên; giả định 1–4 co-op/no migration/no betrayal trong đó đã bị canon mới thay.
 
+## 6. Nhật ký cập nhật 31/10/2026
+
+Bổ sung canon, session/persistence, gameplay spec, scope/roadmap mới và risk/glossary. Đây chỉ là cập nhật tài liệu theo trả lời chủ dự án; không thay đổi trạng thái build/test và không chỉnh scene Unity.

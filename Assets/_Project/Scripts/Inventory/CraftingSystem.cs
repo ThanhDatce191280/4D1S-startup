@@ -71,20 +71,8 @@ namespace HuyetNguyetDaiNgan.Inventory
         /// </summary>
         public bool CanCraft(CraftingRecipeSO recipe)
         {
-            if (recipe == null || inventory == null || recipe.resultItem == null) return false;
-
-            for (int i = 0; i < recipe.ingredients.Count; i++)
-            {
-                var ingredient = recipe.ingredients[i];
-                if (ingredient.item == null) continue;
-
-                if (!inventory.HasItem(ingredient.item.itemId, ingredient.amount))
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return TryBuildRemovalMap(recipe, out Dictionary<string, int> removals)
+                && inventory.CanApplyTransaction(removals, recipe.resultItem, recipe.resultAmount);
         }
 
         /// <summary>
@@ -92,21 +80,38 @@ namespace HuyetNguyetDaiNgan.Inventory
         /// </summary>
         public bool TryCraft(CraftingRecipeSO recipe)
         {
-            if (!CanCraft(recipe)) return false;
-
-            // 1. Trừ toàn bộ nguyên liệu
-            for (int i = 0; i < recipe.ingredients.Count; i++)
-            {
-                var ingredient = recipe.ingredients[i];
-                if (ingredient.item == null) continue;
-
-                inventory.TryRemoveItem(ingredient.item.itemId, ingredient.amount);
-            }
-
-            // 2. Thêm thành phẩm vào túi
-            inventory.TryAddItem(recipe.resultItem, recipe.resultAmount, out int remainder);
+            if (!TryBuildRemovalMap(recipe, out Dictionary<string, int> removals)) return false;
+            if (!inventory.TryApplyTransaction(removals, recipe.resultItem, recipe.resultAmount)) return false;
 
             OnItemCrafted?.Invoke(recipe);
+            return true;
+        }
+
+        private bool TryBuildRemovalMap(CraftingRecipeSO recipe, out Dictionary<string, int> removals)
+        {
+            removals = null;
+            if (recipe == null || inventory == null || recipe.resultItem == null || recipe.resultAmount <= 0) return false;
+            if (string.IsNullOrWhiteSpace(recipe.resultItem.itemId) || recipe.resultItem.maxStackSize <= 0) return false;
+            if (recipe.ingredients == null || recipe.ingredients.Count == 0) return false;
+
+            removals = new Dictionary<string, int>(StringComparer.Ordinal);
+            for (int i = 0; i < recipe.ingredients.Count; i++)
+            {
+                RecipeIngredient ingredient = recipe.ingredients[i];
+                if (ingredient == null || ingredient.item == null || ingredient.amount <= 0) return false;
+                if (string.IsNullOrWhiteSpace(ingredient.item.itemId) || ingredient.item.maxStackSize <= 0) return false;
+
+                if (removals.TryGetValue(ingredient.item.itemId, out int current))
+                {
+                    if (current > int.MaxValue - ingredient.amount) return false;
+                    removals[ingredient.item.itemId] = current + ingredient.amount;
+                }
+                else
+                {
+                    removals.Add(ingredient.item.itemId, ingredient.amount);
+                }
+            }
+
             return true;
         }
     }

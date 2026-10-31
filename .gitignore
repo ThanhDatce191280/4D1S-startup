@@ -74,3 +74,9 @@ ehthumbs.db
 *.app
 *.exe
 
+
+# QA test runner and local CLI cache
+.dotnet-cli/
+.nuget.qa.config
+QaUnityProject/
+QaUnityRun/

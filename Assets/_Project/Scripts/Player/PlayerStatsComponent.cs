@@ -132,6 +132,8 @@ namespace HuyetNguyetDaiNgan.Player
 
         public bool TryConsumeStamina(float amount)
         {
+            if (amount < 0f) return false;
+
             if (CurrentStamina >= amount)
             {
                 CurrentStamina = Mathf.Max(0f, CurrentStamina - amount);
@@ -149,6 +151,8 @@ namespace HuyetNguyetDaiNgan.Player
 
         public bool TryConsumeMana(float amount)
         {
+            if (amount < 0f) return false;
+
             if (CurrentMana >= amount)
             {
                 CurrentMana = Mathf.Max(0f, CurrentMana - amount);
@@ -160,6 +164,18 @@ namespace HuyetNguyetDaiNgan.Player
         public void AddHunger(float amount)
         {
             CurrentHunger = Mathf.Clamp(CurrentHunger + amount, 0f, MaxHunger);
+        }
+
+        public void RestoreStamina(float amount)
+        {
+            if (amount <= 0f) return;
+            CurrentStamina = Mathf.Min(MaxStamina, CurrentStamina + amount);
+        }
+
+        public void RestoreMana(float amount)
+        {
+            if (amount <= 0f) return;
+            CurrentMana = Mathf.Min(MaxMana, CurrentMana + amount);
         }
 
         public void AddResource(ResourceType type, int amount)

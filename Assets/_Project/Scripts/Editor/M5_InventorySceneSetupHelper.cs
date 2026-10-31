@@ -26,6 +26,13 @@ namespace HuyetNguyetDaiNgan.Editor
         [MenuItem("Huyết Nguyệt Đại Ngàn/M5: Setup Inventory & Crafting Scene", false, 60)]
         public static void SetupM5InventoryScene()
         {
+            if (File.Exists(ScenePath))
+            {
+                Debug.LogWarning($"[Huyết Nguyệt M5] Scene '{ScenePath}' đã tồn tại. Helper dừng để không ghi đè scene hoặc prefab người dùng. Hãy đổi tên/xóa scene có chủ đích trước khi tạo mới.");
+                Selection.activeObject = AssetDatabase.LoadAssetAtPath<SceneAsset>(ScenePath);
+                return;
+            }
+
             EnsureDirectories();
 
             Shader urpLit = Shader.Find("Universal Render Pipeline/Lit");
